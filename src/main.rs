@@ -3,7 +3,7 @@ use std::{
     collections::HashSet,
     error::Error,
     fs::{File, OpenOptions},
-    io::{BufRead, BufReader, Write},
+    io::{BufRead, BufReader, BufWriter, Write},
     path::PathBuf,
 };
 #[derive(Parser, Debug)]
@@ -63,10 +63,12 @@ struct ManglerArgs {
 }
 fn mangler(args: &ManglerArgs) -> Result<(), Box<dyn Error>> {
     let input = File::open(&args.file)?;
-    let mut output = OpenOptions::new()
-        .write(true)
-        .create(true)
-        .open(&args.output)?;
+    let mut output = BufWriter::new(
+        OpenOptions::new()
+            .write(true)
+            .create(true)
+            .open(&args.output)?,
+    );
 
     let lines: Result<Vec<String>, _> = BufReader::new(input).lines().collect();
     let mut result: Vec<String> = Vec::new();
@@ -152,8 +154,10 @@ fn mangler(args: &ManglerArgs) -> Result<(), Box<dyn Error>> {
         let mut found = HashSet::new();
         result.retain(|item| found.insert(item.clone()));
 
-        output.write_all(result.join("\n").as_ref())?;
-        output.write_all("\n".as_ref())?;
+        for line in result.iter() {
+            output.write(line.as_ref())?;
+            output.write(b"\n")?;
+        }
 
         result.clear();
     }
