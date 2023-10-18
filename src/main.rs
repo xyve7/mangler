@@ -161,6 +161,7 @@ fn mangler(args: &ManglerArgs) -> Result<(), Box<dyn Error>> {
 
         result.clear();
     }
+    output.flush()?;
     Ok(())
 }
 fn main() {
