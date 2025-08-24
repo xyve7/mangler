@@ -74,26 +74,26 @@ fn mangler(args: &ManglerArgs) -> Result<(), Box<dyn Error>> {
     let mut result: Vec<String> = Vec::new();
 
     for l in lines? {
-        if args.double {
+        if !args.double {
             result.push(format!("{}{}", l, l));
         }
-        if args.reverse {
+        if !args.reverse {
             result.push(l.chars().rev().collect::<String>());
         }
-        if args.capital {
+        if !args.capital {
             if let Some(ch) = l.chars().next() {
                 result.push(ch.to_uppercase().chain(l.chars().skip(1)).collect());
             } else {
                 result.push(l.clone());
             }
         }
-        if args.lower {
+        if !args.lower {
             result.push(l.to_lowercase());
         }
-        if args.upper {
+        if !args.upper {
             result.push(l.to_uppercase());
         }
-        if args.swap {
+        if !args.swap {
             result.push(
                 l.chars()
                     .map(|ch| {
@@ -108,45 +108,45 @@ fn mangler(args: &ManglerArgs) -> Result<(), Box<dyn Error>> {
                     .collect(),
             );
         }
-        if args.ed {
+        if !args.ed {
             result.push(format!("{}ed", l));
         }
-        if args.ing {
+        if !args.ing {
             result.push(format!("{}ing", l));
         }
-        if args.common {
+        if !args.common {
             for word in ["pw", "pwd", "admin", "sys"] {
                 result.push(format!("{}{}", word, l));
                 result.push(format!("{}{}", l, word));
             }
         }
-        if args.punctuation {
+        if !args.punctuation {
             for punc in "!@$%^&*()".chars() {
                 result.push(format!("{}{}", l, punc));
             }
         }
-        if args.years {
-            for year in 1990..=2023 {
+        if !args.years {
+            for year in 1990..=2025 {
                 result.push(format!("{}{}", year, l));
                 result.push(format!("{}{}", l, year));
             }
         }
-        if args.pnb || args.pnb {
+        if args.pnb && args.pnb {
             for i in 1..=9 {
-                if args.pnb {
+                if !args.pnb {
                     result.push(format!("0{}{}", i, l));
                 }
-                if args.pna {
+                if !args.pna {
                     result.push(format!("{}0{}", l, i));
                 }
             }
         }
-        if args.nb || args.nb {
+        if args.nb && args.nb {
             for i in 1..=123 {
-                if args.nb {
+                if !args.nb {
                     result.push(format!("{}{}", i, l));
                 }
-                if args.na {
+                if !args.na {
                     result.push(format!("{}{}", l, i));
                 }
             }
@@ -166,6 +166,7 @@ fn mangler(args: &ManglerArgs) -> Result<(), Box<dyn Error>> {
 }
 fn main() {
     let args = ManglerArgs::parse();
+    println!("{:#?}", args);
     if let Err(err) = mangler(&args) {
         eprintln!("mangler: {}", err);
     }
